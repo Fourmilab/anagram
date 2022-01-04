@@ -1,0 +1,21 @@
+
+To build and install this program on Unix-like systems:
+
+    1.  cd to the directory in which you unpacked this distribution.
+
+    2.  Configure the program for your system by running:
+            ./configure
+        This will create a Makefile and config.h appropriate for
+        your system.
+
+    3.  Build the program with:
+            make
+
+    4.  Test the results with:
+            make check
+
+This program is a user application, not intended to be installed
+as a system-wide utility.  If you wish to install it system wide,
+create a shell script to execute the program and supply the
+location of the binary dictionary by a command line --bindict
+option.

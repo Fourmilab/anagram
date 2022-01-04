@@ -1,0 +1,34 @@
+
+                           A N A G R A M
+
+               by John Walker (http://www.fourmilab.ch/)
+                             Version 1.5
+                             August 2019
+
+ANAGRAM is a program which finds anagrams (based on a standard
+dictionary used in that crossword game whose name can't be
+spoken without summoning lawyers) for a phrase you specify.
+
+For information on how to build and install the program, see
+the INSTALL file.  Source code for this program is written in
+the CWEB "Literate Programming" language in which C source code
+and TeX internal documentation are maintained in a the *.w
+files. CWEB programming tools may be downloaded from:
+
+    http://www-cs-faculty.stanford.edu/~knuth/cweb.html
+
+but you do *not* need to install the CWEB tools to build this
+program; a ready-to-compile C program is included.  An annotated
+source code listing is provided in the file anagram.pdf, which may
+be read with Acrobat Reader, which is a free download from:
+
+    http://www.adobe.com/products/acrobat/readstep.html
+
+The latest version of this program may be downloaded
+from:
+
+    http://www.fourmilab.ch/anagram/
+
+Please report any bugs or documentation errors to:
+
+    bugs@fourmilab.ch

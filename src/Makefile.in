@@ -1,0 +1,256 @@
+
+#   Development tree name for this version
+PRODUCT = @PRODUCT@
+VERSION = @VERSION@
+TREE = $(PRODUCT)-$(VERSION)
+
+#   Build environment
+OSNAME = @OSNAME@
+
+#   Libraries
+INCLUDE_LIBS =
+
+#   Utilities used in building the program
+SHELL = /bin/sh
+CC = @CC@
+CXX = @CXX@
+CTANGLE = cweb/ctangle
+CWEAVE = cweb/cweave
+DVIPS = dvips
+INSTALL = @INSTALL@
+INSTALL_PROGRAM = @INSTALL_PROGRAM@
+INSTALL_DATA = @INSTALL_DATA@
+PAGER = @PAGER@
+PDFTEX = pdftex
+TEX = tex
+XDVI = xdvi
+COMPRESSOR = gzip
+
+#   Utility options
+CFLAGS = @CFLAGS@
+LDFLAGS = @LDFLAGS@ @LDSTATIC@ @LIBS@
+
+#   Targets
+PROGS = cweb/ctangle cweb/cweave anagram
+DATA = wordlist.bin
+DOCUMENTS = anagram.tex
+
+#   Installation destinations
+
+## The 'DESTDIR' variable allows you to install the program into a different
+## location, e.g., for packaging, without affecting the compiled-in pathnames.
+DESTDIR =
+
+datarootdir = @datarootdir@
+prefix = @prefix@
+exec_prefix = @exec_prefix@
+bindir = @bindir@
+mandir = @mandir@
+man1dir = $(mandir)/man1
+man1ext = .1
+BINDIR = $(DESTDIR)$(bindir)
+MAN1DIR = $(DESTDIR)$(man1dir)
+
+prog:	$(PROGS) $(DATA)
+
+data:	$(DATA)
+
+doc:	$(DOCUMENTS)
+
+all:	$(PROGS) $(DATA) $(DOCUMENTS)
+
+#   Anagram program
+
+anagram:    anagram.o getopt.o getopt1.o uncgi.o
+	$(CXX) anagram.o getopt.o getopt1.o uncgi.o -o anagram $(CFLAGS) $(LDFLAGS)
+	@rm -f core
+
+anagram.o: anagram.cc config.h getopt.h
+anagram.cc: anagram.w
+anagram.tex: anagram.w log.w
+anagram.view: anagram.dvi
+
+getopt.o: getopt.c getopt.h
+getopt1.o: getopt1.c getopt.h
+
+uncgi.o:    uncgi.c
+	$(CC) $(CFLAGS) $(INCLUDE_LIBS) -DLIBRARY -c uncgi.c
+	
+#   CTANGLE and CWEAVE utilities
+cweb/ctangle:	cweb/ctangle.c cweb/common.c cweb/common.h
+	$(CC) $(CFLAGS) -o cweb/ctangle cweb/common.c cweb/ctangle.c -Icweb
+
+cweb/cweave:	cweb/cweave.c cweb/common.c cweb/common.h
+	$(CC) $(CFLAGS) -o cweb/cweave cweb/common.c cweb/cweave.c -Icweb
+
+#   Binary dictionary file
+
+wordlist.bin: crossword.txt
+	./anagram --dictionary crossword.txt --export wordlist.bin
+
+#   Build auto-configuration scripts
+
+configurator:
+	rm -f config.cache
+	autoconf
+
+#   Installation
+
+install:
+	@echo 'This program is a user application and is not intended'
+	@echo 'to be installed in a system-wide directory.  It should be'
+	@echo 'run by making its directory current and running the'
+	@echo 'program from it.  If you wish to install the program'
+	@echo 'as a system utility, create a shell script which'
+	@echo 'executes it and supplies the location of the binary'
+	@echo 'dictionary as a command line option.'
+
+#   Uninstallation
+
+uninstall: install
+
+#   Update dependencies among source files
+
+depend:
+	makedepend *.cc *.c
+
+#   There are a variety of levels of cleanliness
+#
+#	clean:	Remove object code, but leave C and TeX extracts from web
+#		and generated documentation.  The current build configuration
+#		is preserved.
+clean:
+	rm -f $(PROGS) *.o *.bak *.shar *.zip *.tar.gz *.tar.Z \
+		       *.dvi core *.out *.log *.aux *.toc *.idx \
+		       *.scn *.gif *.pdb winarch.zip
+	rm -rf ii_files
+#
+#	distclean:  Remove everything not present in the distribution.
+#		    This wipes out the build configuration; you must
+#		    re-run ./configure before rebuilding.
+distclean:  clean
+	rm -f config.cache config.h Makefile config.log config.status
+	rm -f anagram.tex anagram.idx anagram.scn anagram.toc
+	rm -rf autom4te.cache
+#
+#	maintainer-clean:  Remove everything derivative from the
+#			   master web.	We don't delete anagram.cc
+#			   because that causes configure to fail.
+maintainer-clean: distclean
+	@echo 'This command is intended for maintainers to use; it'
+	@echo 'deletes files that may need special tools to rebuild.'
+	rm -f *.ps *.pdf
+	
+#   	reconfigure:	    This is a geeky target for those who
+#   	    	    	    wish to test on multiple platforms.
+#   	    	    	    Assuming you've already configured and
+#   	    	    	    have a more or less valid Makefile, it
+#   	    	    	    uses it to reconfigure for a different
+#   	    	    	    platform.
+reconfigure:
+	rm -f config.cache
+	./configure
+	make clean
+
+#   Create distribution archives
+
+ARCH_SOURCE = Makefile.in anagram.cc anagram.w config.h.in \
+	      getopt1.c getopt.c getopt.h uncgi.c \
+	      cweb Anagram.sln Anagram.vcproj
+ARCH_DOC = anagram.1 anagram.pdf \
+    	   log.w \
+	   COPYING COPYING.GNU INSTALL README
+ARCH_BIN = anagram.exe
+ARCH_DICT_BIN = wordlist.bin
+ARCH_DICT_TXT = crossword.txt
+ARCH_CONF = configure configure.in install-sh
+
+ARCH_FILES = $(ARCH_SOURCE) $(ARCH_DOC) $(ARCH_BIN) $(ARCH_CONF) \
+    	     $(ARCH_DICT_BIN) $(ARCH_DICT_TXT)
+
+dist:	anagram.pdf anagram.cc
+	#   Make zipped archive of Win32 executable
+	rm -f anagram.zip
+	zip anagram.zip $(ARCH_BIN) $(ARCH_DICT_BIN)
+	#   Make gzipped tar archive of complete distribution
+	rm -f $(PROGS)
+	rm -f $(TREE).tar.gz
+	rm -rf $(TREE)
+	mkdir $(TREE)
+	chmod 777 $(TREE)
+	@echo "Copying distribution files"
+	@for file in $(ARCH_FILES); do \
+	    cp -pr $$file $(TREE); \
+	done
+	tar cfv $(TREE).tar $(TREE)
+	$(COMPRESSOR) $(TREE).tar
+	rm -rf $(TREE)
+
+#   Check for lint
+
+lint:	anagram.cc
+	lint anagram.cc
+
+#   View manual page
+
+manpage:
+	nroff -man anagram.1 | $(PAGER)
+
+#   Print manual page
+
+printman:
+	groff -man anagram.1 | lp
+
+# Test it
+
+check:	anagram
+	@if [ x"`./anagram -s farm 'anagram finder' garden in`" = \
+	    'xfarm garden in a' ] ;\
+		then echo 'Tests passed.' ;\
+		else echo '*** Tests failed! ***' ;\
+	fi
+	
+# Make Zipped source to build Windows executable
+
+winarch: anagram.cc
+	rm -f winarch.zip
+	zip winarch.zip anagram.cc \
+		getopt1.c getopt.c uncgi.c \
+		config.h getopt.h \
+		wordlist.bin \
+		Anagram.sln Anagram.vcproj
+
+# Compile a program
+
+.c.o:
+	$(CC) $(CFLAGS) $(INCLUDE_LIBS) -c $<
+
+.c:
+	$(CC) $(CFLAGS) $(INCLUDE_LIBS) $(LDFLAGS) -o $@ $<
+
+.cc.o:
+	$(CXX) $(CFLAGS) $(INCLUDE_LIBS) -c $<
+
+.cc:
+	$(CXX) $(CFLAGS) $(INCLUDE_LIBS) $(LDFLAGS) -o $@ $<
+
+.w.c:
+	$(CTANGLE) $<
+
+.c.cc:
+	mv $*.c $*.cc
+
+.w.tex:
+	$(CWEAVE) $<
+
+.tex.dvi:
+	$(TEX) $<
+
+.tex.pdf:
+	TEXINPUTS=cweb:: $(PDFTEX) $<
+
+.dvi.view:
+	$(XDVI) -s 0 $<
+
+.SUFFIXES:
+.SUFFIXES: .bin .c .cc .o .ch .dvi .pdf .tex .view .w .1

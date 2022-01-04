@@ -1,0 +1,256 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<title>ANAGRAM: Anagram Finder</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<link rel="stylesheet" href="https://www.fourmilab.ch/documents/styles/standard_screen.css" type="text/css" />
+<meta name="keywords" content="anagram, finder, word, game, play" />
+<meta name="description" content="ANAGRAM--Anagram Finder" />
+<meta name="author" content="John Walker" />
+<meta name="robots" content="index" />
+<style type="text/css">
+    dl dt {
+        font-weight: bold;
+        margin-bottom: 0px;
+        margin-top: 1ex;
+    }
+
+    dl dd {
+        margin-top: 0px;
+        text-align: justify;
+    }
+</style>
+</head>
+
+<body class="standard">
+
+<center>
+<h1>
+<font color="#6060E0"><img src="figures/anagram.png" width="640" height="98"
+    alt="Anagram Finder" /></font>
+</h1>
+</center>
+
+<p class="j">
+An <cite>anagram</cite> of a word or phrase is the result of
+rearranging its letters to form another meaningful word or
+phrase.  For example, an anagram of &ldquo;anagram&nbsp;finder&rdquo;
+is &ldquo;garden&nbsp;in&nbsp;a&nbsp;farm&rdquo; (work it out!).
+</p>
+
+<p class="j">
+This page describes, in Unix manual page style, a C++ program
+<a href="#download">available for downloading</a> from this site
+which finds English language anagrams for a phrase.  The program
+is available as source code compatible with any current C++
+compiler or as a ready-to-run 32-bit Windows executable.
+</p>
+
+<p class="j">
+Anagrams are generated based on the official dictionary (second
+edition) of that
+<a href="http://www.scrabble.com/" target="_blank">crossword game</a>
+whose name you cannot mention
+without having lawyers burst out of your screen brandishing
+menacing documents, courtesy of Grady Ward's
+<a href="http://www.dcs.shef.ac.uk/research/ilash/Moby/" target="_blank">Moby Words</a>
+compilation.  We search the dictionary in decreasing order of word
+length, as longer words tend to produce more interesting anagrams.
+Only alphabetic characters are considered in anagrams, and accented
+characters are &ldquo;flattened&rdquo; by removing the accents.
+</p>
+
+<p class="j">
+Users may create their own dictionaries from word lists; this
+permits supporting other languages and vocabularies, for example,
+using only words which appeared in the works of Shakespeare.  If
+you create interesting dictionaries and wish to share them, please
+get in touch&mdash;we'll be glad to host them on this site.
+</p>
+
+<hr />
+
+<h3>NAME</h3>
+
+<blockquote>
+     <b>anagram</b> &ndash; find anagrams for phrase
+</blockquote>
+
+<h3>SYNOPSIS</h3>
+<blockquote>
+     <tt>anagram</tt> [ <em>options</em> ] [ <tt>'</tt><em>target phrase</em><tt>'</tt>
+        [ <em>seed</em>&hellip; ] ]
+</blockquote>
+
+<h3>DESCRIPTION</h3>
+
+<p class="j">
+<b>anagram</b>
+finds anagrams or permutations of words in the <em>target phrase</em>.
+If one or more
+<em>seed</em> words is given, only anagrams containing all of those words
+will be shown.  The target and seed may be specified by options or
+CGI program environment variables as well as on the command line.
+</p>
+
+<h3>OPTIONS</h3>
+
+<p class="j">
+Options are specified on the command line prior to the input and
+output file names (if any).  Options may appear in any order.  Long
+options beginning with &ldquo;<tt>--</tt>&rdquo; may be abbreviated to any
+unambiguous prefix; single-letter options introduced by a single &ldquo;<tt>-</tt>&rdquo;
+may be aggregated.
+</p>
+
+<dl>
+
+<dt> --all</dt> <dd>Generate all anagrams in <tt>--cgi&nbsp;--step&nbsp;2</tt>.</dd>
+
+<dt> --bail</dt> <dd>Bail out after the first anagram found containing a word.
+    In many cases this drastically reduces the time required
+    to run the program.  You can review the list of words
+    appearing in anagrams and then request a complete list
+    of anagrams containing &ldquo;interesting&rdquo; ones.</dd>
+
+<dt> --bindict, <b>-b</b> <em>file</em></dt> <dd>Load binary dictionary from <em>file</em>.
+    The default binary dictionary is <tt>wordlist.bin</tt>.</dd>
+
+<dt> --cgi</dt> <dd>When executed as a CGI program on a Web server, set
+    options from form fields.  These
+    settings may be overridden by command line options which
+    follow <tt>--cgi</tt>.</dd>
+
+<dt> --copyright</dt> <dd>Print copying information.</dd>
+
+<dt> --dictionary, <b>-d</b> <em>file</em></dt> <dd>Load word list from <em>file</em>.
+    This is (only) used with the <tt>--export</tt> option to compile a
+    word list into a binary dictionary.  The default word list
+    is <tt>crossword.txt</tt>.</dd>
+
+<dt> --export <em>file</em></dt> <dd>Create a binary dictionary <em>file</em> from the
+    word list specified by the <tt>--dictionary</tt> option or the default
+    <tt>crossword.txt</tt>.</dd>
+
+<dt> --help, <b>-u</b></dt> <dd>Print how-to-call information including a
+list of options.</dd>
+
+<dt> --html, <b>-h</b></dt> <dd>Generate HTML output when run as a CGI program on a Web
+    server.  The HTML is based on the template file specified by
+    the <tt>--template</tt> option, which defaults to a file named
+    <tt>template.html</tt> in the current directory.</dd>
+
+<dt> --permute, <b>-p</b> <b>'</b><em>phrase</em><b>'</b></dt> <dd>Print all permutations of words in the
+    given <em>phrase</em>.  The phrase must be quoted so that blanks
+    separating words are considered part of the single <em>phrase</em>
+    argument.</dd>
+
+<dt> --seed, <b>-s</b> <em>word</em></dt> <dd>Find only anagrams which contain the
+    specified <em>word</em>.  You may specify as many seed words as
+    you wish (each with a separate <tt>--seed</tt> option) to restrict the
+    anagrams to those containing all of the seed words.  To
+    obtain a list of words which appear in anagrams of a phrase,
+    specify the <tt>--bail</tt> option.  You can also specify seed words
+    on the command line after the options and target phrase, if any.</dd>
+
+<dt> --step <em>number</em></dt> <dd>Perform step <em>number</em> when operating as a
+    CGI program on a Web server.  Step 0, the default, selects non-CGI
+    operation; the program acts as a command line utility.  In step 1,
+    a list of words appearing in anagrams is generated.  Step 2 generates
+    anagrams in which a selected word appears (or, all anagrams
+    if the HTML template permits this option).  Step 3 generates all
+    permutations of words in a selected anagram.</dd>
+
+<dt> --target, <b>-t</b> <b>'</b><em>phrase</em><b>'</b></dt> <dd>Generate anagrams or permutations for
+    the specified <em>phrase</em>, which must be quoted if it contains more than
+    a single word.  If no <tt>--target</tt> is specified, the program uses the first
+    command line argument as the target.</dd>
+
+<dt> --verbose, <b>-v</b></dt> <dd>Print diagnostic information as the program
+    performs various operations.</dd>
+
+<dt> --version</dt> <dd>Print program version information.</dd>
+
+</dl>
+
+<h3>FILES</h3>
+
+<p class="j">
+Output is written to standard output and may be redirected or piped
+to another program in the usual manner.  When generating HTML as a CGI
+program, it is the responsibility of the shell script which invokes
+<b>anagram</b> to emit the <tt>Content-type:&nbsp;text/html</tt>
+and blank line which precedes the HTML.  This permits changing the
+type to <tt>text/plain</tt> for debugging.
+</p>
+
+<h3>BUGS</h3>
+
+<p class="j">
+The standard dictionary includes many extremely obscure words, including
+all the curious short words permitted in That Crossword Game.  Consequently,
+anagrams of phrases with many high-frequency letters will often include
+these words.  Sorting through them all can be tedious and (see below) time
+consuming.  Somebody ought to edit the dictionary and create an
+&ldquo;interesting word&rdquo; list which excludes the esoterica.
+</p>
+
+<p class="j">
+Long phrases containing many high-frequency letters may have tens or
+hundreds of millions of anagrams, not counting permutations.  If you
+launch such a search, be aware of the potential consequences.  If you're
+setting up the program on a server, you may want to limit the resources
+it can consume.
+</p>
+
+<p class="j">
+If you find errors in this program or document, please report them to
+Bravo Uniform Golf Sierra @ Foxtrot Oscar Uniform Romeo Mike India
+Lima Alpha Bravo Decimal Charlie Hotel.  If you don't have any idea
+what I just said, please
+<a href="https://www.fourmilab.ch/documents/phoneticalphabet/" target="_blank">consult
+this document</a>.
+</p>
+
+<h2><a name="download" class="i"><img src="https://www.fourmilab.ch/images/icons/file.png" alt=""
+    align="middle" width="40" height="40" /> Download</a></h2>
+
+<dl>
+<dt></dt> <dd><img src="https://www.fourmilab.ch/images/bullets/ball_blue_white.png" width="19" height="19"
+    align="top" alt="*" /> &nbsp;
+    <b>anagram</b> C++ source code: <a href="anagram-1.5.tar.gz">anagram-1.5.tar.gz</a></dd>
+<dt></dt> <dd><img src="https://www.fourmilab.ch/images/bullets/ball_green_white.png" width="19" height="19"
+    align="top" alt="*" /> &nbsp;
+    Ready-to-run 32-bit Windows executable (Zipped archive): <a href="anagram.zip">anagram.zip</a></dd>
+<dt></dt> <dd><img src="https://www.fourmilab.ch/images/bullets/ball_red_white.png" width="19" height="19"
+    align="top" alt="*" /> &nbsp;
+    <a href="anagram.pdf">Read <b>anagram</b> source code</a> [PDF]</dd>
+</dl>
+
+<h3>AUTHOR</h3>
+<address>
+          John Walker
+<br />
+          <a href="https://www.fourmilab.ch/">http://www.fourmilab.ch/</a>
+</address>
+
+<p />
+
+<blockquote>
+    <p class="copying">
+     This software is in the public domain.  Permission to use, copy,
+     modify, and distribute this software and its documentation for
+     any purpose and without fee is hereby granted, without any
+     conditions or restrictions.  This software is provided &ldquo;as is&rdquo;
+     without express or implied warranty.
+     </p>
+</blockquote>
+
+<p class="j">
+Last update: August 8th, 2019
+</p>
+
+<h3><a href="https://www.fourmilab.ch/">Fourmilab Home Page</a></h3>
+</body>
+</html>

@@ -1,0 +1,121 @@
+# $Id: Makefile.in,v 1.31 1999/10/14 23:47:53 mason Exp $
+@MCOMMON@
+
+srcdir =	.
+VPATH = 	.
+.PATH:		.
+
+# one up
+basedir = ..
+# top dir
+topdir = ../..
+# this dir relative to top dir
+thisdir = src/cweb
+
+
+DEBUG=@DEBUG@
+
+first_rule: all
+dummy:
+
+CWEAVE = ./cweave
+CTANGLE = ./ctangle
+
+CWEBSRCS = common.c ctangle.c cweave.c
+
+LIBOBJS = common.o ctangle.o cweave.o
+
+EXTRAOBJS = @OBJLIST@
+
+
+.SUFFIXES:	.c .o .dvi .tex .w .pdf
+.PHONY:
+.DONTCARE:
+
+# inference rules
+.c.o:
+	$(CC) $(DEFS) $(DEBUG) -c $(CPPFLAGS) -I$(srcdir) -I$(basedir) $(DINCLUDE) $(CFLAGS) $<
+
+.w.tex:
+	$(CWEAVE) $*
+
+.tex.dvi:	
+	tex $<
+
+.w.dvi:
+	make $*.tex
+	make $*.dvi
+
+.w.c:
+	$(CTANGLE) $*
+
+.w.o:
+	make $*.c
+	make $*.o
+
+.w.pdf:
+	make $*.tex
+	case "$(PDFTEX)" in \
+	 dvipdfm ) tex "\let\pdf+ \input $*"; dvipdfm $* ;; \
+	 pdftex ) pdftex $* ;; \
+	esac
+
+#-------------------------------------------------------------------------
+all: Makefile cweave ctangle
+	@echo "==== Make of cweb is good ===="
+	@echo " "
+
+
+Makefile: $(srcdir)/Makefile.in $(topdir)/config.status
+	cd $(topdir) \
+	  && CONFIG_FILES=$(thisdir)/$@ CONFIG_HEADERS= $(SHELL) ./config.status
+
+ctangle: ctangle.o common.o
+	$(CC) $(LDFLAGS) -L. -o $@ ctangle.o common.o 
+
+cweave: cweave.o common.o
+	$(CC) $(LDFLAGS) -L. -o $@ cweave.o common.o 
+	
+common.c: common.w common_bacula.ch
+	$(CTANGLE) common.w common_bacula.ch
+
+ctangle.c: ctangle.w ctangle_bacula.ch
+	$(CTANGLE) ctangle.w ctangle_bacula.ch
+
+cweave.c: cweave.w cweave_bacula.ch
+	$(CTANGLE) cweave.w cweave_bacula.ch
+	 
+install:
+
+uninstall:
+
+clean:
+	$(RMF) *.a core a.out *.o *.bak *~ *.intpro *.extpro 1 2 3
+	$(RMF) cweave ctangle
+
+realclean: clean
+	$(RMF) tags
+
+distclean: realclean
+	if test $(srcdir) = .; then $(MAKE) realclean; fi
+	(cd $(srcdir); $(RMF) Makefile)
+
+# Semi-automatic generation of dependencies:
+# Use gcc -MM because X11 `makedepend' doesn't work on all systems
+# and it also includes system headers.
+# `semi'-automatic since dependencies are generated at distribution time.
+
+depend:
+	@$(MV) Makefile Makefile.bak
+	@$(SED) "/^# DO NOT DELETE:/,$$ d" Makefile.bak > Makefile
+	@$(ECHO) "# DO NOT DELETE: nice dependency list follows" >> Makefile
+	@$(CC) -S -M $(CPPFLAGS) $(XINC) -I$(srcdir) -I$(basedir) $(SQL_INC) *.c >> Makefile
+	@if test -f Makefile ; then \
+	    $(RMF) Makefile.bak; \
+	else \
+	   $(MV) Makefile.bak Makefile; \
+	   echo -e "Something went wrong\n\a"; \
+	fi
+
+# -----------------------------------------------------------------------
+# DO NOT DELETE: nice dependency list follows

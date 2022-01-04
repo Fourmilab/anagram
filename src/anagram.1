@@ -1,0 +1,179 @@
+.TH ANAGRAM 1 "20 MAR 2002"
+.UC 4
+.SH NAME
+anagram \- anagram finder
+.SH SYNOPSIS
+.B anagram
+[
+.I options
+] [
+.BI ' "target phrase" '
+[
+.I seed...
+] ]
+.SH DESCRIPTION
+.B anagram
+finds anagrams or permutations of words in the
+.I target phrase
+If one or more
+.I seed
+words is given, only anagrams containing all of those words
+will be shown.  The target and seed may be specified by options or
+CGI program environment variables as well as on the command line.
+.SH OPTIONS
+.TP 10
+.B \-\-all
+Generate all anagrams in
+.BR "\-\-cgi \-\-step 2" .
+.TP
+.B \-\-bail
+Bail out after the first anagram found containing a word.
+In many cases this drastically reduces the time required
+to run the program.  You can review the list of words
+appearing in anagrams and then request a complete list
+of anagrams containing ``interesting'' ones.
+.TP
+.BI "\-\-bindict,\0\-b" " file"
+Load binary dictionary from
+.IR file .
+The default binary dictionary is
+.nh
+.BR wordlist.bin .
+.hy
+.TP
+.B \-\-cgi
+When executed as a CGI program on a Web server, set
+options from form fields.  These
+settings may be overridden by command line options which
+follow
+.BR \-\-cgi .
+.TP
+.B \-\-copyright
+Print copying information.
+.TP
+.BI "\-\-dictionary,\0\-d" " file"
+Load word list from 
+.IR file .
+This is (only) used with the
+.B \-\-export
+option to compile a
+word list into a binary dictionary.  The default word list
+is
+.BR crossword.txt .
+.TP
+.BI \-\-export " file"
+Create a binary dictionary
+.I file
+from the
+word list specified by the
+.B \-\-dictionary
+option of the default
+.nh
+.BR crossword.txt .
+.hy
+.TP
+.BR \-\-help ",\0" \-u
+Print how-to-call information including a
+list of options.
+.TP
+.BR \-\-html ",\0" \-h
+Generate HTML output when run as a CGI program on a Web
+server.  The HTML is based on the template file specified by
+the
+.B \-\-template
+option, which defaults to a file named
+.nh
+.B template.html
+.hy
+in the current directory.
+.TP
+.BI "\-\-permute,\0\-p '" phrase '
+Print all permutations of words in the
+given
+.IR phrase .
+The phrase must be quoted so that blanks
+separating words are considered part of the single
+.I phrase
+argument.
+.TP
+.BI "\-\-seed,\0\-s" " word"
+Find only anagrams which contain the
+specified
+.IR word .
+You may specify as many seed words as
+you wish (each with a separate
+.B \-\-seed
+option) to restrict the
+anagrams to those containing all of the seed words.  To
+obtain a list of words which appear in anagrams of a phrase,
+specify the
+.B \-\-bail
+option.  You can also specify seed words
+on the command line after the options and target phrase, if any.
+.TP
+.BI \-\-step " number"
+Perform step
+.I number
+when operating as a
+CGI program on a Web server.  Step 0, the default, selects non-CGI
+operation; the program acts as a command line utility.  In step 1,
+a list of words appearing in anagrams is generated.  Step 2 generates
+anagrams in which a selected word appears (or, all anagrams
+if the HTML template permits this option).  Step 3 generates all
+permutations of words in a selected anagram.
+.TP
+.BI "\-\-target,\0\-t '" phrase '
+Generate anagrams or permutations for
+the specified
+.IR phrase ,
+which must be quoted if it contains more than
+a single word.  If no
+.B \-\-target
+is specified, the program uses the first
+command line argument as the target.
+.TP
+.BR \-\-verbose ",\0" \-v
+Print diagnostic information as the program
+performs various operations.
+.TP
+.B \-\-version
+Print program version information.
+.SH FILES
+Output is written to standard output and may be redirected or piped
+to another program in the usual manner.  When generating HTML as a CGI
+program, it is the responsibility of the shell script which invokes
+.B anagram
+to emit the
+.nh
+.B "Content-type:\ text/html"
+.hy
+and blank line which precedes the HTML.  This permits changing the
+type to
+.nh
+.B text/plain
+.hy
+for debugging.
+.SH BUGS
+The standard dictionary includes many extremely obscure words, including
+all the curious short words permitted in That Crossword Game.  Consequently,
+anagrams of phrases with many high-frequency letters will often include
+these words.  Sorting through them all can be tedious and (see below) time
+consuming.  Somebody ought to edit the dictionary and create an
+``interesting word'' list which excludes the esoterica.
+.PP
+Long phrases containing many high-frequency letters may have tens or
+hundreds of millions of anagrams, not counting permutations.  If you
+launch such a search, be aware of the potential consequences.  If you're
+setting up the program on a server, you may want to limit the resources
+it can consume.
+.ne 10
+.SH AUTHOR
+.ce 2
+John Walker
+http://www.fourmilab.ch/
+.PP
+This software is in the public domain. Permission to use, copy,
+modify, and distribute this software and its documentation for
+any purpose and without fee is hereby granted, without any
+conditions or restrictions.  This software is provided ``as
+is'' without express or implied warranty.

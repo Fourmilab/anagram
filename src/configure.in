@@ -1,0 +1,43 @@
+dnl Process this file with autoconf to produce a configure script.
+
+AC_INIT(anagram.w)
+AC_CONFIG_HEADER(config.h)
+AC_PREFIX_DEFAULT(/usr/local)
+
+PRODUCT=anagram
+VERSION=1.5
+AC_DEFINE_UNQUOTED(PRODUCT, "$PRODUCT")
+AC_DEFINE_UNQUOTED(VERSION, "$VERSION")
+AC_SUBST(PRODUCT)
+AC_SUBST(VERSION)
+
+dnl Checks for programs.
+AC_PROG_CC
+AC_PROG_CXX
+AC_PROG_INSTALL
+AC_CHECK_PROGS(PAGER, "less")
+AC_CHECK_PROGS(PAGER, "more")
+AC_CHECK_PROGS(PAGER, "cat")
+
+dnl Checks for header files.
+AC_HEADER_STDC
+AC_CHECK_HEADERS(unistd.h string.h strings.h errno.h)
+
+dnl Checks for typedefs, structures, and compiler characteristics.
+
+dnl Checks for library functions.
+AC_CHECK_FUNCS(stat)
+AC_CHECK_FUNCS(mmap)
+AC_CHECK_FUNCS(strerror)
+
+dnl Check for machine environment
+OSNAME=`uname`
+if test "${OSNAME}" = "SunOS" ; then
+    LDSTATIC="-static"
+else
+    LDSTATIC=""
+fi
+AC_SUBST(OSNAME)
+AC_SUBST(LDSTATIC)
+
+AC_OUTPUT(Makefile)
