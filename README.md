@@ -13,4 +13,4 @@ the files derived from them.  Instructions for building the program
 are in `src/INSTALL`.
 
 User documentation and annotated source code are in the file
-[`src/anagram.pdf`](src/anagram.pdf).
+[`https://www.fourmilab.ch/anagram/anagram.pdf`](src/anagram.pdf).
